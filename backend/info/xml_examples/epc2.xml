@@ -1,0 +1,21 @@
+<ObjectEvent>
+        <eventTime>2008-03-16T22:13:16.397+01:00</eventTime>
+        <eventTimeZoneOffset>+01:00</eventTimeZoneOffset>
+        <epcList>
+          <epc>urn:epc:id:sgtin:0614141.107346.2017</epc>
+        </epcList>
+        <action>OBSERVE</action>
+        <bizStep>urn:epcglobal:epcis:bizstep:fmcg:shipped</bizStep>
+        <disposition>urn:epcglobal:epcis:disp:fmcg:unknown</disposition>
+        <readPoint>
+          <id>urn:epc:id:sgln:0614141.07346.1234</id>
+        </readPoint>
+        <bizLocation>
+          <id>urn:epcglobal:fmcg:loc:0614141073467.A23-49</id>
+        </bizLocation>
+        <bizTransactionList>
+          <bizTransaction type="urn:epcglobal:fmcg:btt:po">
+            http://transaction.acme.com/po/12345678
+          </bizTransaction>
+        </bizTransactionList>
+</ObjectEvent>

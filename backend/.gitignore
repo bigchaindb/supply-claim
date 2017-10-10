@@ -1,0 +1,18 @@
+# use glob syntax
+syntax: glob
+
+*.elc
+*.pyc
+*~
+*.db
+
+# Temporary files (vim backups)
+*.swp
+
+
+# Log files:
+*.log
+
+.idea
+
+conf/conf.cfg

@@ -15,9 +15,9 @@ app.debug = True
 app.config['SECRET_KEY'] = 'qsdkqlsdjfghhliqjkyezgkjl'
 
 app.config['MONGODB_SETTINGS'] = {
-    'db': conf.DATABASE_NAME,
-    'host': conf.DATABASE_ADDRESS,
-    'port': conf.DATABASE_PORT
+    'db': conf.MONGO_DB_NAME,
+    'host': conf.MONGO_HOST,
+    'port': conf.MONGO_PORT
 }
 
 # Initializes the database

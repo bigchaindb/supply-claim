@@ -7,14 +7,15 @@ try:
 except:
     import ConfigParser as confparser
 # load the configuration
+
 config = confparser.SafeConfigParser()
 config.read("./conf/conf.cfg")
 
 PATH = os.path.abspath(".")
 
-DATABASE_NAME = config.get('database', 'name')
-DATABASE_PORT = int(config.get('database', 'port'))
-DATABASE_ADDRESS = config.get('database', 'address')
+MONGO_DB_NAME = config.get('mongo', 'db_name')
+MONBO_PORT = int(config.get('mongo', 'port'))
+MONGO_HOST = config.get('mongo', 'host')
 #DATABASE_USERNAME = config.get('database', 'username')
 #DATABASE_PASSWORD = config.get('database', 'password')
 

@@ -14,7 +14,7 @@ def index():
     return jsonify({})
 
 
-@app.route('/api/register/', methods=['POST'])
+@app.route('/api/register/company/', methods=['POST'])
 def register_company():
     parser = reqparse.RequestParser()
     parser.add_argument('company_id', type=int, required=True)
@@ -35,6 +35,11 @@ def register_company():
 
     return jsonify(data="ok")
 
+@app.route('/api/register/onboard/', methods=['GET'])
+def onboard():
+    """
+    Do the onboarding
+    """
 
 # @app.route('/what/<string:epc>', methods=['GET'])
 # def what(epc=None):

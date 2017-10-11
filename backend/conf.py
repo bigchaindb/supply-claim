@@ -9,13 +9,13 @@ except:
 # load the configuration
 
 config = confparser.SafeConfigParser()
-config.read("./conf/conf.cfg")
+config.read("app.cfg")
 
 PATH = os.path.abspath(".")
 
-MONGO_DB_NAME = config.get('database', 'name')
-MONGO_PORT = int(config.get('database', 'port'))
-MONGO_HOST = config.get('database', 'address')
+MONGO_DB_NAME = config.get('mongo', 'db_name')
+MONGO_PORT = int(config.get('mongo', 'port'))
+MONGO_HOST = config.get('mongo', 'host')
 #DATABASE_USERNAME = config.get('database', 'username')
 #DATABASE_PASSWORD = config.get('database', 'password')
 

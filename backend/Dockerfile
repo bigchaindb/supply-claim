@@ -10,7 +10,11 @@ RUN pip install -r requirements.txt
 
 WORKDIR /app
 
-COPY ./conf/flask-docker-compose.cfg app.cfg
+# copy the staging config to docker, which is what will be deployed on azure
+# this should be in env settings at some point, this is just now & for dev
+COPY ./conf/staging.cfg app.cfg
+
+# copy the source code over, including the conf & startup stubs
 COPY ./epcis_api/ ./epcis_api/
 COPY ./runserver.py .
 COPY ./conf.py .

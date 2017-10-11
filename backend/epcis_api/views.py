@@ -4,14 +4,16 @@ from flask import jsonify, request
 from flask_restful import reqparse
 from mongoengine import NotUniqueError
 from epcis_api import app, models
-from epcis_api.bigchain_utils import get_keypair, onboard_user, insert_code
+from epcis_api.bigchain_utils import get_keypair, onboard_user, insert_code, create_st_asset, \
+    insert_scan, find_asset
 
 
 @app.route('/', methods=['GET'])
 def index():
     """
     """
-    return jsonify({})
+    id=find_asset('testuuid')
+    return jsonify(id)
 
 
 @app.route('/api/register/company/', methods=['POST'])
@@ -61,6 +63,23 @@ def add_code():
     if not data.get('message', None):
         return jsonify(error="Message is required."), 400
     result = insert_code(data)
+
+    return jsonify(result)
+
+
+@app.route('/api/scans/add/', methods=['POST'])
+def add_scan():
+    """
+    Add a code as asset to BDB.
+    """
+    parser = reqparse.RequestParser()
+    parser.add_argument('message', type=str, required=True)
+    parser.add_argument('uuid', type=str, required=True)
+    parser.add_argument('lat', type=float, required=True)
+    parser.add_argument('lng', type=float, required=True)
+    request_params = parser.parse_args()
+
+    result = insert_scan(request_params)
 
     return jsonify(result)
 

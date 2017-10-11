@@ -4,7 +4,7 @@ from flask import jsonify, request
 from flask_restful import reqparse
 from mongoengine import NotUniqueError
 from epcis_api import app, models
-from epcis_api.bigchain_utils import get_keypair
+from epcis_api.bigchain_utils import get_keypair, onboard_user
 
 
 @app.route('/', methods=['GET'])
@@ -35,11 +35,21 @@ def register_company():
 
     return jsonify(data="ok")
 
-@app.route('/api/register/onboard/', methods=['GET'])
+
+@app.route('/api/register/onboard/', methods=['POST'])
 def onboard():
     """
-    Do the onboarding
+    Save the install_id and pub_key as an asset in DBD, setting ST as the owner.
     """
+    parser = reqparse.RequestParser()
+    parser.add_argument('pub_key', type=str, required=True)
+    parser.add_argument('install_id', type=str, required=True)
+    request_params = parser.parse_args()
+
+    result = onboard_user(request_params['pub_key'], request_params['install_id'])
+
+    return jsonify(result)
+
 
 # @app.route('/what/<string:epc>', methods=['GET'])
 # def what(epc=None):

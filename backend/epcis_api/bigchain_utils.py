@@ -6,6 +6,8 @@ from bigchaindb_driver.crypto import generate_keypair
 
 import conf
 
+PUB_KEY = conf.BIGCHAIN_PUB
+PRIV_KEY = conf.BIGCHAIN_PRIV
 
 def get_bigchain_db():
     bdb_root_url = conf.BIGCHAIN_DB
@@ -15,6 +17,33 @@ def get_bigchain_db():
 def get_keypair():
     key = generate_keypair()
     return key.public_key, key.private_key
+
+
+def onboard_user(pub_key, install_id):
+    bdb = get_bigchain_db()
+
+    asset = {
+        "data": {
+            "name": "user_onboarding",
+            "pub_key": pub_key,
+            "install_id": install_id
+        }
+    }
+
+    prepared_creation_tx = bdb.transactions.prepare(
+        operation='CREATE',
+        signers=PUB_KEY,
+        asset=asset
+    )
+    fulfilled_creation_tx = bdb.transactions.fulfill(prepared_creation_tx, private_keys=PRIV_KEY)
+    bdb.transactions.send(fulfilled_creation_tx)
+
+    return dict(
+        name="user_onboarding",
+        pub_key=pub_key,
+        install_id=install_id,
+        txid=fulfilled_creation_tx['id']
+    )
 
 
 def insert_event(event_id, company):

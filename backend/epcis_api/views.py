@@ -4,7 +4,7 @@ from flask import jsonify, request
 from flask_restful import reqparse
 from mongoengine import NotUniqueError
 from epcis_api import app, models
-from epcis_api.bigchain_utils import get_keypair, onboard_user
+from epcis_api.bigchain_utils import get_keypair, onboard_user, insert_code
 
 
 @app.route('/', methods=['GET'])
@@ -47,6 +47,20 @@ def onboard():
     request_params = parser.parse_args()
 
     result = onboard_user(request_params['pub_key'], request_params['install_id'])
+
+    return jsonify(result)
+
+
+@app.route('/api/codes/add/', methods=['POST'])
+def add_code():
+    """
+    Add a code as asset to BDB.
+    """
+    data = request.get_json(force=True)
+
+    if not data.get('message', None):
+        return jsonify(error="Message is required."), 400
+    result = insert_code(data)
 
     return jsonify(result)
 

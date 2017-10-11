@@ -20,8 +20,6 @@ def get_keypair():
 
 
 def onboard_user(pub_key, install_id):
-    bdb = get_bigchain_db()
-
     asset = {
         "data": {
             "name": "user_onboarding",
@@ -29,6 +27,29 @@ def onboard_user(pub_key, install_id):
             "install_id": install_id
         }
     }
+    txid = create_st_asset(asset=asset)
+
+    return dict(
+        name="user_onboarding",
+        pub_key=pub_key,
+        install_id=install_id,
+        txid=txid
+    )
+
+
+def insert_code(code):
+    asset = {
+        "data": code
+    }
+    txid = create_st_asset(asset=asset)
+
+    return dict(
+        txid=txid
+    )
+
+
+def create_st_asset(asset):
+    bdb = get_bigchain_db()
 
     prepared_creation_tx = bdb.transactions.prepare(
         operation='CREATE',
@@ -38,29 +59,23 @@ def onboard_user(pub_key, install_id):
     fulfilled_creation_tx = bdb.transactions.fulfill(prepared_creation_tx, private_keys=PRIV_KEY)
     bdb.transactions.send(fulfilled_creation_tx)
 
-    return dict(
-        name="user_onboarding",
-        pub_key=pub_key,
-        install_id=install_id,
-        txid=fulfilled_creation_tx['id']
-    )
+    return fulfilled_creation_tx['id']
 
-
-def insert_event(event_id, company):
-    bdb = get_bigchain_db()
-    asset = {
-        "data": {
-            "event_id": str(event_id)
-        }
-    }
-    prepared_creation_tx = bdb.transactions.prepare(
-        operation='CREATE',
-        signers=company.bigchain_public_key,
-        asset=asset
-    )
-    fulfilled_creation_tx = bdb.transactions.fulfill(prepared_creation_tx, private_keys=company.bigchain_private_key)
-    sent_creation_tx = bdb.transactions.send(fulfilled_creation_tx)
-    txid = fulfilled_creation_tx['id']
-    print(txid)
-
-    bdb.transactions.status(txid)
+# def insert_event(event_id, company):
+#     bdb = get_bigchain_db()
+#     asset = {
+#         "data": {
+#             "event_id": str(event_id)
+#         }
+#     }
+#     prepared_creation_tx = bdb.transactions.prepare(
+#         operation='CREATE',
+#         signers=company.bigchain_public_key,
+#         asset=asset
+#     )
+#     fulfilled_creation_tx = bdb.transactions.fulfill(prepared_creation_tx, private_keys=company.bigchain_private_key)
+#     sent_creation_tx = bdb.transactions.send(fulfilled_creation_tx)
+#     txid = fulfilled_creation_tx['id']
+#     print(txid)
+#
+#     bdb.transactions.status(txid)

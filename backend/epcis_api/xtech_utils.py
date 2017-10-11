@@ -1,14 +1,15 @@
 import requests
 import json
 import uuid
+import conf
 
-base_endpoint = 'https://wallet.staging.payxapi.com/apiv2/wallet/'
-transfer_url = base_endpoint + 'transfer'
-default_wallet = '51287e29-5601-454f-a0c5-0b542e868af1'
+ENDPOINT = conf.XTECH_END
+TRANS = conf.XTECH_END + conf.XTECH_TRANS
+DEF_WALLET = conf.XTECH_DEFW
 
 
 def add_wallet(public_key):
-    add_wallet_url = base_endpoint + 'addwallet'
+    add_wallet_url = ENDPOINT + 'addwallet'
     payload = {'user_id': public_key}
     r = requests.post(add_wallet_url, payload)
     response = r.json()
@@ -29,11 +30,11 @@ def add_wallet(public_key):
 
 
 def transfer(wallet_uuid, amount, reference):
-    return call_transfer(wallet_uuid, default_wallet, amount, reference)
+    return call_transfer(wallet_uuid, DEF_WALLET, amount, reference)
 
 
 def top_up(wallet_uuid, amount):
-    return call_transfer(default_wallet, wallet_uuid, amount, 'top-up wallet')
+    return call_transfer(DEF_WALLET, wallet_uuid, amount, 'top-up wallet')
 
 
 def call_transfer(wallet_uuid_from, wallet_uuid_to, amount, reference):
@@ -42,7 +43,7 @@ def call_transfer(wallet_uuid_from, wallet_uuid_to, amount, reference):
 	       'to_wallet': wallet_uuid_to,
 	       'amount': amount,
 	       'reference': reference}
-    r = requests.post(transfer_url, payload)
+    r = requests.post(TRANS, payload)
     response = r.json()
     #in case there is an error
     print('Error transfering: ' + str(response['error']))

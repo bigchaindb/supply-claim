@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*
 import flask_restful
 from flask import Flask
+from flask_cors import CORS
 from flask_mongoengine import MongoEngine
 
 
@@ -19,6 +20,9 @@ app.config['MONGODB_SETTINGS'] = {
     'host': conf.MONGO_HOST,
     'port': conf.MONGO_PORT
 }
+
+# Allow CORS requests
+CORS(app)
 
 # Initializes the database
 db = MongoEngine()

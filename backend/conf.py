@@ -26,3 +26,7 @@ BIGCHAIN_PRIV = config.get('bigchain', 'private_key')
 WEBSERVER_DEBUG = int(config.get('webserver', 'debug')) == 1
 WEBSERVER_HOST = config.get('webserver', 'host')
 WEBSERVER_PORT = int(config.get('webserver', 'port'))
+
+XTECH_END = config.get('xtech', 'base_endpoint')
+XTECH_TRANS = config.get('xtech', 'transfer_key')
+XTECH_DEFW = config.get('xtech', 'default_wallet')

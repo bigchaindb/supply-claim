@@ -7,19 +7,24 @@ from mongoengine import NotUniqueError
 from epcis_api import app, models
 from epcis_api.bigchain_utils import get_keypair, onboard_user, insert_code, \
     insert_scan, get_or_create_wallet, buy_code_action
+from epcis_api.xtech_utils import add_wallet,transfer, get_wallet
+import uuid
 
 
 @app.route('/', methods=['GET'])
 def index():
     """
     """
-    # wallet_id = xtech_utils.add_wallet(uuid.uuid4())
+    print('----ADD WALLET AND TOP UP----')
+    wallet_uuid = add_wallet(uuid.uuid4())
+    print('----GE_WALLET----')
+    #get_wallet(wallet_uuid)
+    
+    amount = 5000  # any number to test the transfer
     #
-    # amount = 5000  # any number to test the transfer
-    #
-    # if (wallet_id != 0):
-    #     print('----Transfer----')
-    #     xtech_utils.transfer(wallet_id, amount, 'Transfer test')
+    if (wallet_uuid != 0):
+            print('----Transfer----')
+            transfer(wallet_uuid, amount, 'Transfer test')
 
     return jsonify({})
 

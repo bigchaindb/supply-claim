@@ -63,15 +63,23 @@ def call_transfer(wallet_uuid_from, wallet_uuid_to, amount, reference):
     response = r.json()
     #in case there is an error
     print('Error transfering: ' + str(response['error']))
+    print('TRX UUID: ' + str(response))
     resp_data = response['data']
     
-    resp_data = ''
-    try:
-        resp_data = response['data']
-    except IndexError:
-        print('Error: Transfer not done. Possible wallet id or transfer id duplicated.')
-        return 0
     
     
-    print('TRX UUID: ' + resp_data['uuid'])
-    return resp_data['uuid']
+    txid = None
+    new_balance = None
+    if not(response['error']):
+        print('TRX UUID: ' + resp_data['uuid'])
+        txid = resp_data['uuid']
+        new_balance = get_wallet(wallet_uuid_from)['balance']
+    
+    
+    
+    resp =  {'success' : response['error'],
+        'insufficient_funds' : True,
+        'txid' : txid,
+        'new_balance' : new_balance
+    }
+    return resp

@@ -128,7 +128,7 @@ def buy_code_action(post_data):
 
     transer_money_res = transfer(wallet_id, price, 'Product purchased (%s)' % int(time.time()))
 
-    if transer_money_res.get('uuid', None):
+    if transer_money_res.get('uuid', None) and transer_money_res.get('success', False):
         # Transfer the code ownership
         transfer_st_asset(code_id, pub_key, {})
 

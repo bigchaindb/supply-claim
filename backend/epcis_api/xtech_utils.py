@@ -70,16 +70,20 @@ def call_transfer(wallet_uuid_from, wallet_uuid_to, amount, reference):
     
     txid = None
     new_balance = None
+    insufficient_funds = False
     if not(response['error']):
         print('TRX UUID: ' + resp_data['uuid'])
         txid = resp_data['uuid']
         new_balance = get_wallet(wallet_uuid_from)['balance']
+    else:
+        insufficient_funds = response['msg_trans'] == 'negative_source_wallet'
+        if insufficient_funds:
+            new_balance = get_wallet(wallet_uuid_from)['balance']
     
-    
-    
-    resp =  {'success' : response['error'],
-        'insufficient_funds' : True,
-        'txid' : txid,
-        'new_balance' : new_balance
+    resp = {
+        'success': not response['error'],
+        'insufficient_funds': insufficient_funds,
+        'txid': txid,
+        'new_balance': new_balance
     }
     return resp

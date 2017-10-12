@@ -15,16 +15,16 @@ import uuid
 def index():
     """
     """
-    print('----ADD WALLET AND TOP UP----')
-    wallet_uuid = add_wallet(uuid.uuid4())
-    print('----GE_WALLET----')
-    #get_wallet(wallet_uuid)
-    
-    amount = 5000  # any number to test the transfer
+    # print('----ADD WALLET AND TOP UP----')
+    # wallet_uuid = add_wallet(uuid.uuid4())
+    # print('----GE_WALLET----')
+    # #get_wallet(wallet_uuid)
     #
-    if (wallet_uuid != 0):
-            print('----Transfer----')
-            transfer(wallet_uuid, amount, 'Transfer test')
+    # amount = 1000  # any number to test the transfer
+    # #
+    # if (wallet_uuid != 0):
+    #         print('----Transfer----')
+    #         print(transfer(wallet_uuid, amount, 'Transfer test'))
 
     return jsonify({})
 

@@ -205,7 +205,7 @@ def transfer_st_asset(txid, to_pub_key, meta):
 
 def find_code_asset_id(message):
     bdb = get_bigchain_db()
-    result = bdb.assets.get(search=message)
+    result = bdb.assets.get(search="\"" + message + "\"")
     if result:
         for r in result:
             data = r.get('data', {})
@@ -217,14 +217,14 @@ def find_code_asset_id(message):
 
 def find_asset_id(message):
     bdb = get_bigchain_db()
-    result = bdb.assets.get(search=message)
+    result = bdb.assets.get(search="\"" + message + "\"")
     if result:
         return result[0]['id']
 
 
 def find_asset(string):
     bdb = get_bigchain_db()
-    result = bdb.assets.get(search=string)
+    result = bdb.assets.get(search="\"" + string + "\"")
     if result:
         return result[0]
     return {}
@@ -232,7 +232,7 @@ def find_asset(string):
 
 def find_scan_asset(string):
     bdb = get_bigchain_db()
-    result = bdb.assets.get(search=string)
+    result = bdb.assets.get(search="\"" + string + "\"")
     if result:
         for r in result:
             if r.get('data', {}).get('name', '') == 'scan':
@@ -249,7 +249,7 @@ def get_transaction(asset_id):
 
 def find_wallet(pub_key):
     bdb = get_bigchain_db()
-    result = bdb.assets.get(search=pub_key)
+    result = bdb.assets.get(search="\"" + pub_key + "\"")
     for r in result:
         if r.get('data', {}).get('name', '') == 'wallet':
             return r

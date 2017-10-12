@@ -139,7 +139,7 @@ def buy_code_action(post_data):
     pub_key = post_data['pub_key']
     code_id = post_data['code_id']
     code_transaction = get_transaction(code_id)
-    price = code_transaction.get('meta_data', {}).get('scm_data', {}).get('price', None)
+    price = code_transaction.get('metadata', {}).get('scm_data', {}).get('price', None)
     if not price:
         raise Exception('Price was not set for this code.')
 

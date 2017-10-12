@@ -22,7 +22,7 @@ def add_wallet(public_key):
         return 0
     
     print('----Top up----')
-    top_up(resp_data['uuid'], 2200)
+    top_up(resp_data['uuid'], 25)
     print('Wallet UUID: ' + resp_data['uuid'])
     return resp_data['uuid']
 

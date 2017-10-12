@@ -6,7 +6,7 @@ from flask_restful import reqparse
 from mongoengine import NotUniqueError
 from epcis_api import app, models
 from epcis_api.bigchain_utils import get_keypair, onboard_user, insert_code, \
-    insert_scan, get_or_create_wallet, buy_code_action
+    insert_scan, get_or_create_wallet, buy_code_action, get_wallet_balance
 from epcis_api.xtech_utils import add_wallet,transfer, get_wallet
 import uuid
 
@@ -66,8 +66,8 @@ def onboard():
     return jsonify(result)
 
 
-@app.route('/api/register/wallet/', methods=['POST'])
-def get_wallet():
+@app.route('/api/wallets/register/', methods=['POST'])
+def register_wallet():
     """
     Adds a wallet for a user (pub key) or returns it if it exists
     """
@@ -76,6 +76,21 @@ def get_wallet():
     request_params = parser.parse_args()
 
     result = get_or_create_wallet(request_params['pub_key'])
+
+    return jsonify(result)
+
+
+@app.route('/api/wallets/balance/', methods=['POST'])
+def balance_wallet():
+    """
+    Returns the wallet balance for a user + wallet
+    """
+    parser = reqparse.RequestParser()
+    parser.add_argument('pub_key', type=str, required=True)
+    parser.add_argument('wallet_id', type=str, required=True)
+    request_params = parser.parse_args()
+
+    result = get_wallet_balance(request_params['pub_key'], request_params['wallet_id'])
 
     return jsonify(result)
 

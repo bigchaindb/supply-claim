@@ -6,7 +6,7 @@ from bigchaindb_driver import BigchainDB
 from bigchaindb_driver.crypto import generate_keypair
 
 import conf
-from epcis_api.xtech_utils import add_wallet, transfer
+from epcis_api.xtech_utils import add_wallet, transfer, get_wallet
 
 PUB_KEY = conf.BIGCHAIN_PUB
 PRIV_KEY = conf.BIGCHAIN_PRIV
@@ -29,7 +29,7 @@ def onboard_user(pub_key, install_id):
             "install_id": install_id
         }
     }
-    txid = create_st_asset(asset=asset)
+    txid = create_st_asset(asset=asset, meta={})
 
     return dict(
         name="user_onboarding",
@@ -63,7 +63,7 @@ def insert_code(code):
 def insert_scan(scan):
     message = scan.pop('message')
     uuid = scan.get('uuid')
-    scan_asset = find_asset(uuid)
+    scan_asset = find_scan_asset(uuid)
 
     if scan_asset:
         return dict(
@@ -71,12 +71,12 @@ def insert_scan(scan):
             code_asset_id=scan_asset['data']['fk_code']
         )
 
-    id = find_asset_id(message)
+    code_id = find_code_asset_id(message)
 
     asset = {
         "data": {
             "name": "scan",
-            "fk_code": id,
+            "fk_code": code_id,
             "uuid": uuid,
             "lat": scan.get('lat', ''),
             "lng": scan.get('lng', ''),
@@ -90,7 +90,7 @@ def insert_scan(scan):
 
     return dict(
         txid=txid,
-        code_asset_id=id
+        code_asset_id=code_id
     )
 
 
@@ -117,6 +117,23 @@ def get_or_create_wallet(pub_key):
     )
 
 
+def get_wallet_balance(pub_key, wallet_id):
+    """
+    Checks the balance of a wallet. Validates if the public key matches with this specific wallet.
+    """
+    wallet = find_wallet(pub_key)
+
+    if not wallet or wallet.get('data', {}).get('wallet_id', '') != wallet_id:
+        return dict(error="Wallet for this user is incorrect")
+
+    balance = get_wallet(wallet_id).get('balance', 'Error')
+
+    return dict(
+        wallet_id=wallet_id,
+        balance=balance
+    )
+
+
 def buy_code_action(post_data):
     wallet_id = post_data['wallet_id']
     pub_key = post_data['pub_key']
@@ -135,7 +152,9 @@ def buy_code_action(post_data):
     return transer_money_res
 
 
-def create_st_asset(asset, meta):
+def create_st_asset(asset, meta=None):
+    if not meta:
+        meta = {}
     bdb = get_bigchain_db()
     meta['timestamp'] = int(time.time())
     prepared_creation_tx = bdb.transactions.prepare(
@@ -184,6 +203,18 @@ def transfer_st_asset(txid, to_pub_key, meta):
     return fulfilled_tx['id']
 
 
+def find_code_asset_id(message):
+    bdb = get_bigchain_db()
+    result = bdb.assets.get(search=message)
+    if result:
+        for r in result:
+            data = r.get('data', {})
+            if data.get('message', '') == message and data.get('name', '') == 'code':
+                return r['id']
+
+    return None
+
+
 def find_asset_id(message):
     bdb = get_bigchain_db()
     result = bdb.assets.get(search=message)
@@ -197,6 +228,17 @@ def find_asset(string):
     if result:
         return result[0]
     return {}
+
+
+def find_scan_asset(string):
+    bdb = get_bigchain_db()
+    result = bdb.assets.get(search=string)
+    if result:
+        for r in result:
+            if r.get('data', {}).get('name', '') == 'scan':
+                return r
+    return {}
+
 
 
 def get_transaction(asset_id):

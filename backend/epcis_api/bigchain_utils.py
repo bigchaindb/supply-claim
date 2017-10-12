@@ -6,6 +6,7 @@ from bigchaindb_driver import BigchainDB
 from bigchaindb_driver.crypto import generate_keypair
 
 import conf
+from epcis_api.xtech_utils import add_wallet, transfer
 
 PUB_KEY = conf.BIGCHAIN_PUB
 PRIV_KEY = conf.BIGCHAIN_PRIV
@@ -93,6 +94,47 @@ def insert_scan(scan):
     )
 
 
+def get_or_create_wallet(pub_key):
+    wallet = find_wallet(pub_key)
+    if wallet:
+        wallet_id = wallet.get('data', {}).get('wallet_id', 'Not found')
+        txid = wallet['id']
+    else:
+        wallet_id = add_wallet(pub_key)
+        asset = {
+            "data": {
+                "name": "wallet",
+                "pub_key": pub_key,
+                "wallet_id": wallet_id,
+            }
+        }
+        meta = {}
+        txid = create_st_asset(asset, meta)
+
+    return dict(
+        txid=txid,
+        wallet_id=wallet_id
+    )
+
+
+def buy_code_action(post_data):
+    wallet_id = post_data['wallet_id']
+    pub_key = post_data['pub_key']
+    code_id = post_data['code_id']
+    code_transaction = get_transaction(code_id)
+    price = code_transaction.get('meta_data', {}).get('price', None)
+    if not price:
+        raise Exception('Price was not set for this code.')
+
+    transer_money_res = transfer(wallet_id, price, 'Product purchased (%s)' % int(time.time()))
+
+    if transer_money_res.get('uuid', None):
+        # Transfer the code ownership
+        transfer_st_asset(code_id, pub_key, {})
+
+    return transer_money_res
+
+
 def create_st_asset(asset, meta):
     bdb = get_bigchain_db()
     meta['timestamp'] = int(time.time())
@@ -154,6 +196,22 @@ def find_asset(string):
     result = bdb.assets.get(search=string)
     if result:
         return result[0]
+    return {}
+
+
+def get_transaction(asset_id):
+    bdb = get_bigchain_db()
+    result = bdb.transactions.retrieve(asset_id)
+    return result
+
+
+def find_wallet(pub_key):
+    bdb = get_bigchain_db()
+    result = bdb.assets.get(search=pub_key)
+    for r in result:
+        if r.get('data', {}).get('name', '') == 'wallet':
+            return r
+    return None
 
 # def insert_event(event_id, company):
 #     bdb = get_bigchain_db()

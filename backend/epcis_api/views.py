@@ -1,19 +1,27 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from flask import jsonify, request
 from flask_restful import reqparse
 from mongoengine import NotUniqueError
 from epcis_api import app, models
-from epcis_api.bigchain_utils import get_keypair, onboard_user, insert_code, create_st_asset, \
-    insert_scan, find_asset
+from epcis_api.bigchain_utils import get_keypair, onboard_user, insert_code, \
+    insert_scan, get_or_create_wallet, buy_code_action
 
 
 @app.route('/', methods=['GET'])
 def index():
     """
     """
-    id=find_asset('testuuid')
-    return jsonify(id)
+    # wallet_id = xtech_utils.add_wallet(uuid.uuid4())
+    #
+    # amount = 5000  # any number to test the transfer
+    #
+    # if (wallet_id != 0):
+    #     print('----Transfer----')
+    #     xtech_utils.transfer(wallet_id, amount, 'Transfer test')
+
+    return jsonify({})
 
 
 @app.route('/api/register/company/', methods=['POST'])
@@ -53,6 +61,20 @@ def onboard():
     return jsonify(result)
 
 
+@app.route('/api/register/wallet/', methods=['POST'])
+def get_wallet():
+    """
+    Adds a wallet for a user (pub key) or returns it if it exists
+    """
+    parser = reqparse.RequestParser()
+    parser.add_argument('pub_key', type=str, required=True)
+    request_params = parser.parse_args()
+
+    result = get_or_create_wallet(request_params['pub_key'])
+
+    return jsonify(result)
+
+
 @app.route('/api/codes/add/', methods=['POST'])
 def add_code():
     """
@@ -63,6 +85,22 @@ def add_code():
     if not data.get('message', None):
         return jsonify(error="Message is required."), 400
     result = insert_code(data)
+
+    return jsonify(result)
+
+
+@app.route('/api/codes/buy/', methods=['POST'])
+def buy_code():
+    """
+    Buy a 'code' (product) using XTECH wallet. Deducts money and transfers the code asset
+    """
+    parser = reqparse.RequestParser()
+    parser.add_argument('wallet_id', type=str, required=True)
+    parser.add_argument('code_id', type=str, required=True)
+    parser.add_argument('pub_key', type=str, required=True)
+    request_params = parser.parse_args()
+
+    result = buy_code_action(request_params)
 
     return jsonify(result)
 
